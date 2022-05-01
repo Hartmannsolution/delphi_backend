@@ -1,0 +1,4 @@
+**/target/
+**/app-db-data/
+**/__pycache__/
+**/target/
