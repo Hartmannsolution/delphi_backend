@@ -20,4 +20,5 @@ Simple sql demo in demo1.py and demo using ORM in facade, models and db.py
 `docker-compose exec db psql --username=dev --dbname=app`: 
 `docker inspect fastapi_template_db_1 | grep IPAdd ress`: 
 `docker-compose up --build`: Only seems to be able to start up correctly with the --build flag. 
-# repo auto created
+#### postgresql commands
+` SELECT column_name FROM information_schema.columns WHERE TABLE_NAME = 'answers';` show all columns in table

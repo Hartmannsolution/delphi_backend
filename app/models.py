@@ -14,10 +14,12 @@ class Answer(Base):
     __tablename__ = "answers"
 
     id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String)
     text = Column(String)
     class_name = Column(String, ForeignKey("classname.name"))
     is_positive = Column(Boolean) 
     count = Column(Integer)
+    comment = Column(String)
     category_id = Column(Integer, ForeignKey("categories.id"))
     category = relationship("Category", backref="categories")
     def __repr__(self): # just for testing purpose

@@ -6,6 +6,7 @@ class AnswerBase(BaseModel):
     text: str
     class_name: str
     is_positive: bool
+    uuid: str
     class Config: # this is to let pydantic know how this should be interpreted (as a dict i believe). https://stackoverflow.com/questions/69504352/fastapi-get-request-results-in-typeerror-value-is-not-a-valid-dict.
         orm_mode = True
 
@@ -16,7 +17,10 @@ class Answer(AnswerBase):
         return 'answer: '+id
 
 class AnswerRate(Answer):
-    inc_number: int
+    inc_number: Optional[int]
+
+class AnswerComment(AnswerRate):
+    comment: Optional[str]
 
 class AnswerCollection(BaseModel):
     answers: list[AnswerBase]

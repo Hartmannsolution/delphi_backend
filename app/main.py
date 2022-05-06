@@ -4,20 +4,26 @@ from app.api import ping
 from . import facade, models, schemas
 from .db import SessionLocal, engine
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 
 # from app.db import engine, database, metadata
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine) # creates all tables that extends the Base class.
-# # For the database.
-# @app.on_event("startup")
-# async def startup():
-#     await database.connect()
 
-# # For the database.
-# @app.on_event("shutdown")
-# async def shutdown():
-#     await database.disconnect()
+# CORS 
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -79,7 +85,10 @@ def get_db():
 @app.post("/answers/", response_model=str)
 def create_answers(answers: list[schemas.AnswerBase], db: Session = Depends(get_db)):
     for answer in answers:
+        if not facade.is_valid_class(db, answer.class_name):
+            return "NOT APPROVED - WRONG CLASSNAME"
         ans = facade.create_answer(db=db, answer=answer)
+        
     if len(answers)<6:
         return "INSUFFICIENT" # if you have not posted 6 answers you will not be allowed to rate
     return "APPROVED"
@@ -89,13 +98,23 @@ def rate_answers(answers: list[schemas.AnswerRate], db: Session = Depends(get_db
     counter = 0
     for answer in answers:
         counter =+ answer.inc_number
-        if counter >= 20: # only allow 10 ratings pr. person
+        if counter > len(answers): # only allow 10 ratings pr. person
             return "RATED TOO MANY"
         ans = facade.increment_answer(db, answer.id, number=answer.inc_number)
+        if ans is None:
+            print("Not found")
     return "RATED"
 
+@app.post("/answers/comment", response_model=str)
+def comment_answer(answers: list[schemas.AnswerComment],db: Session = Depends(get_db)): 
+    for answer in answers:
+        ans = facade.comment_answer(db, answer.id, comment=answer.comment)
+        if ans is None:
+            print("Not found")
+    return "COMMENTED"
+
 # READ ALL
-@app.get("/answers/{class_name}", response_model=list[schemas.Answer])
+@app.get("/answers/{class_name}", response_model=list[schemas.AnswerComment])
 def read_users(class_name:str, db: Session = Depends(get_db)):
     answers = facade.get_answers_by_class(db, class_name)
     return answers
@@ -104,6 +123,10 @@ def read_users(class_name:str, db: Session = Depends(get_db)):
 def create_class(class_name:schemas.ClassName, db: Session = Depends(get_db)):
     result = facade.create_class(db=db, class_name=class_name) # important here to use named parameters.
     return result
+
+@app.get("/classname/{class_name}", response_model=bool)
+def is_valid_class(class_name: str, db: Session = Depends(get_db)):
+    return facade.is_valid_class(db, class_name)
 
 # # READ BY ID
 # @app.get("/users/{user_id}", response_model=schemas.User)
