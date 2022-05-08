@@ -8,7 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # from app.db import engine, database, metadata
 
-app = FastAPI()
+app = FastAPI(
+    title="delphi_backend",
+    version=0.1,
+    root_path="/delphi_backend/"
+)
 models.Base.metadata.create_all(bind=engine) # creates all tables that extends the Base class.
 
 # CORS 
