@@ -27,7 +27,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    command: uvicorn app.main:app --reload --reload-dir app --workers 1 --host 0.0.0.0 --port 8000 # --relaod ensures server will restart when changes are added to code base.
+    command: uvicorn app.main:app --reload --reload-dir app --proxy-headers --forwarded-allow-ips='*' --workers 1 --host 0.0.0.0 --port 8000 # --relaod ensures server will restart when changes are added to code base.
     # restart: always # reload is already set above.
     depends_on:
       - db
