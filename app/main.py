@@ -87,7 +87,7 @@ def get_db():
 #     return facade.create_answer(db=db, answer=answer)
 
 # CREATE MULTIPLE
-@app.post("/answers/", response_model=str)
+@app.post("/answers", response_model=str)
 def create_answers(answers: list[schemas.AnswerBase], db: Session = Depends(get_db)):
     for answer in answers:
         if not facade.is_valid_class(db, answer.class_name):
