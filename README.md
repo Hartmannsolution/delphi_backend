@@ -22,3 +22,7 @@ Simple sql demo in demo1.py and demo using ORM in facade, models and db.py
 `docker-compose up --build`: Only seems to be able to start up correctly with the --build flag. 
 #### postgresql commands
 ` SELECT column_name FROM information_schema.columns WHERE TABLE_NAME = 'answers';` show all columns in table
+
+## Test
+With pytest and requests installed (requirements.txt) we can easily run restassured type tests. See app/tests/test_main.py for example. Run with `docker-compose exec web pytest .`
+See more on [FastApi Documentation](https://fastapi.tiangolo.com/tutorial/testing/)

@@ -89,6 +89,7 @@ def get_db():
 # CREATE MULTIPLE
 @app.post("/answers", response_model=str)
 def create_answers(answers: list[schemas.AnswerBase], db: Session = Depends(get_db)):
+    """When students answers positive and critical points"""
     for answer in answers:
         if not facade.is_valid_class(db, answer.class_name):
             return "NOT APPROVED - WRONG CLASSNAME"
@@ -100,6 +101,7 @@ def create_answers(answers: list[schemas.AnswerBase], db: Session = Depends(get_
 
 @app.post("/answers/rating", response_model=str)
 def rate_answers(answers: list[schemas.AnswerRate], db: Session = Depends(get_db)):
+    """When students rate all statements by importance"""
     counter = 0
     for answer in answers:
         counter =+ answer.inc_number
@@ -112,25 +114,33 @@ def rate_answers(answers: list[schemas.AnswerRate], db: Session = Depends(get_db
 
 @app.post("/answers/comment", response_model=str)
 def comment_answer(answers: list[schemas.AnswerComment],db: Session = Depends(get_db)): 
+    """When teacher writes comments after discussion in class on each statement"""
     for answer in answers:
         ans = facade.comment_answer(db, answer.id, comment=answer.comment)
         if ans is None:
             print("Not found")
     return "COMMENTED"
 
+# @app.post("/answers/comment", response_model=str)
+# def comment_answer(classnames: list[],db: Session = Depends(get_db)): 
+#     pass
+
 # READ ALL
 @app.get("/answers/{class_name}", response_model=list[schemas.AnswerComment])
 def read_users(class_name:str, db: Session = Depends(get_db)):
+    """When students load answers to rate AND when teacher load answers to comment"""
     answers = facade.get_answers_by_class(db, class_name)
     return answers
 
 @app.post("/classname", response_model=schemas.ClassName)
 def create_class(class_name:schemas.ClassName, db: Session = Depends(get_db)):
+    """Create a new class name to start a new delphi evaluation"""
     result = facade.create_class(db=db, class_name=class_name) # important here to use named parameters.
     return result
 
 @app.get("/classname/{class_name}", response_model=bool)
 def is_valid_class(class_name: str, db: Session = Depends(get_db)):
+    """Check if the class is a valid class in the system"""
     return facade.is_valid_class(db, class_name)
 
 # # READ BY ID
