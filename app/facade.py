@@ -1,4 +1,6 @@
 from nis import cat
+from tkinter import N
+from tkinter.messagebox import NO
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
 from . import models, schemas
@@ -53,22 +55,25 @@ def create_class(db: Session, class_name: schemas.ClassNameBase):
 
 def terminate_delphi(db: Session, class_name: str, new_class_name: str):
     """Terminate this evaluation by changing the classname on all the answers of the class. Thereby making it impossible to post more answers and to rate the answers"""
+    classname = db.query(models.Class_name).filter(models.Class_name.name==class_name).first()
+    if(classname is None):
+        return False
     all_answers = db.query(models.Answer).filter(models.Answer.class_name == class_name).all()
     newclass = create_class(db, schemas.ClassNameBase(name=new_class_name))
     for ans in all_answers:
         ans.class_name = new_class_name
         db.add(ans) # when you Session.add() a transient instance, it becomes "pending".
-    classname = db.query(models.Class_name).filter(models.Class_name.name==class_name).first()
     # classname.name = new_class_name
     # db.add(classname)
+    # print('CLASSNAME: ',classname,' : ',new_class_name)
     db.delete(classname)
     try:
         db.commit()
     except Exception as e:
         print('ERROR',e)
         db.rollback()
-        return None
-    return "TERMINATED"
+        return False
+    return True
 
 
 def increment_answer(db: Session, answer_id: int, number: int):
@@ -134,7 +139,7 @@ if __name__ == "__main__":
     # result = increment_answer(db, 3,2)
     # print('Incremented!!!:',result)
     result = comment_answer(db, 1, "Dette er min kommentar til Statement 1")
-    # result = terminate_delphi(db, "someclass", "someotherclass")
-    # print(result)
+    result = terminate_delphi(db, "someclass", "someotherclass")
+    print(result)
     print(is_valid_class(db,"someotherclass"))
     db.close()
