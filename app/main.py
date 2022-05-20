@@ -143,6 +143,10 @@ def is_valid_class(class_name: str, db: Session = Depends(get_db)):
     """Check if the class is a valid class in the system"""
     return facade.is_valid_class(db, class_name)
 
+@app.get("/terminate/{class_name}", response_model=bool)
+def terminate_eval(class_name: str, db: Session = Depends(get_db)):
+    """Terminate the evaluation by changing the classname"""
+    return facade.terminate_delphi(db, class_name, f'{class_name}-terminated');
 # # READ BY ID
 # @app.get("/users/{user_id}", response_model=schemas.User)
 # def read_user(user_id: int, db: Session = Depends(get_db)):
