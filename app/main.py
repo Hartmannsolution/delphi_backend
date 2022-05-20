@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(
     title="delphi_backend",
     version=0.1,
-    # root_path="/delphi_backend/" # This is for production with nginx forward
+    root_path="/delphi_backend/" # This is for production with nginx forward
 )
 models.Base.metadata.create_all(bind=engine) # creates all tables that extends the Base class.
 

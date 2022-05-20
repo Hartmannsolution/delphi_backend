@@ -26,3 +26,7 @@ Simple sql demo in demo1.py and demo using ORM in facade, models and db.py
 ## Test
 With pytest and requests installed (requirements.txt) we can easily run restassured type tests. See app/tests/test_main.py for example. Run with `docker-compose exec web pytest .`
 See more on [FastApi Documentation](https://fastapi.tiangolo.com/tutorial/testing/)
+
+## Deploy
+In main.py comment out this line: `root_path="/delphi_backend/" # This is for production with nginx forward` when running locally and bring it back before git push.
+On the server `sshedu` go to directory: delphi_backend and `git pull` to get the newest changes. No need to restart container or do anything. In the docker compose it says restart on changes.
